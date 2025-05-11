@@ -1,0 +1,56 @@
+In Helm templates, the .Release and .Chart objects are built-in variables that provide metadata about the release and chart itself. Here's how you can use them:
+
+✅ .Release Object
+This contains metadata about the specific Helm release being deployed.
+
+Common properties:
+
+Property	        Description
+.Release.Name	    The name of the release
+.Release.Namespace	The Kubernetes namespace being used
+.Release.Revision	Revision number of the release
+.Release.IsInstall	true if this is a new install
+.Release.IsUpgrade	true if this is an upgrade
+
+Example:
+
+metadata:
+  name: {{ .Release.Name }}-myapp
+
+
+----------------------------------------------
+
+✅ .Chart Object
+This provides metadata defined in your Chart.yaml.
+
+Common properties:
+
+Property	        Description
+.Chart.Name	        Name of the chart
+.Chart.Version	    Version from Chart.yaml
+.Chart.AppVersion	Application version from Chart.yaml
+
+Example:
+
+labels:
+  chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+
+----------------------------------------------------------------
+
+🔄 Putting it Together
+You might use them in a Deployment like this:
+
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+        release: {{ .Release.Name }}
+
+
+=========================================================================
