@@ -1,0 +1,58 @@
+
+Verifying a Helm chart typically involves several checks to ensure it is valid, 
+follows best practices, and will work correctly when deployed. Here’s how to 
+verify a Helm chart step by step:
+
+✅ 1. Lint the Chart (Basic Validation)
+Use Helm’s built-in linter to check for issues in your chart structure and templates:
+
+
+helm lint <path-to-chart>
+This checks for things like:
+
+Invalid YAML
+
+Missing required fields in Chart.yaml
+
+Common template errors
+
+✅ 2. Template Rendering (Dry Run)
+Render the chart locally to see what Kubernetes resources it would create:
+
+
+helm template <release-name> <path-to-chart> --values values.yaml
+This lets you inspect the raw manifests without actually deploying them.
+
+You can also do a dry run install with:
+
+
+helm install <release-name> <path-to-chart> --dry-run --debug
+✅ 3. Schema Validation (Optional, with JSON Schema)
+If your chart has a values.schema.json file, Helm will validate values.yaml against 
+it automatically during helm install or helm lint.
+
+Make sure your schema is correct and run:
+
+
+helm lint <path-to-chart>
+✅ 4. Install in a Test Environment
+Deploy it in a non-production Kubernetes cluster (like Minikube or Kind):
+
+
+helm install <release-name> <path-to-chart> --namespace <test-namespace>
+Then inspect the created resources:
+
+
+kubectl get all -n <test-namespace>
+✅ 5. Use helm unittest (Optional Unit Testing Plugin)
+Install the plugin:
+
+
+helm plugin install https://github.com/helm-unittest/helm-unittest
+Then write test cases in tests/ directory and run:
+
+
+helm unittest <path-to-chart>
+✅ 6. Security and Best Practices (Optional)
+Use tools like Kube-score, Checkov, or Datree to check Helm-rendered templates for 
+security and policy compliance.
