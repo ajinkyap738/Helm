@@ -1,0 +1,43 @@
+In a Helm chart, the pipe symbol (|) is used in YAML to indicate multi-line strings, 
+and also in Helm templates to pipe output from one function to another using Go templating.
+
+Here are the two main contexts where | is used in Helm:
+
+1. YAML Syntax for Multi-line Strings
+In regular YAML (used in Helm chart files like values.yaml or rendered templates/*.yaml), 
+the | symbol preserves newlines.
+
+Example:
+
+config: |
+  line1
+  line2
+  line3
+This would render the value of config as a literal block:
+
+
+config: "line1\nline2\nline3\n"
+Useful for including scripts, config files, or certificates.
+
+------------------------------------------------------------------
+
+2. Go Template Pipelining in Helm Templates
+In Helm templates (inside templates/*.yaml), | is used like in Unix shells to pipe the 
+output of one function into another.
+
+Example:
+
+{{ .Values.name | upper }}
+This takes the value name from values.yaml, and converts it to uppercase using the upper function.
+
+More Complex Example:
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "mychart.fullname" . }}
+data:
+  myvalue: {{ .Values.someValue | quote }}
+include "mychart.fullname" . is a function call.
+
+.Values.someValue | quote will wrap the value in double quotes.
