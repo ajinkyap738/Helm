@@ -3,6 +3,8 @@ repository about helm
 
 
 🔧 What is Helm?
+Helm is a Kubernetes application lifecycle management tool, particularly focused on packaging, deploying, and managing applications in a repeatable and configurable way.
+
 Helm helps you define, install, and upgrade complex Kubernetes applications. It uses Helm charts, which are collections of YAML templates that describe a related set of Kubernetes resources.
 
 ✅ Why Use Helm?
