@@ -1,0 +1,206 @@
+In a Helm chart, templates are written using the Go template language, 
+and a variety of functions are used to manipulate values, control logic, and 
+dynamically generate Kubernetes manifests. These functions can come from:
+
+Go Template functions (from the text/template and sprig libraries)
+
+Helm-specific functions
+
+🔹 Commonly Used Helm Functions
+
+🔹 1. default
+Purpose: Provides a fallback value if the given value is empty or not defined.
+
+Syntax:
+
+
+{{ default "fallback" .Values.someValue }}
+Example:
+
+
+replicas: {{ default 3 .Values.replicaCount }}
+If .Values.replicaCount is not set, the default value of 3 is used.
+
+----------------------------------------------------------
+🔹 2. upper
+Purpose: Converts a string to uppercase.
+
+Syntax:
+
+
+{{ .Values.env | upper }}
+Example:
+
+
+env: {{ "production" | upper }}
+Output:
+
+
+env: PRODUCTION
+----------------------------------------------------------
+
+🔹 3. include
+Purpose: Renders another template (usually from _helpers.tpl) and returns the result.
+
+Syntax:
+
+
+{{ include "template.name" . }}
+Example in _helpers.tpl:
+
+
+{{- define "mychart.fullname" -}}
+{{ .Release.Name }}-{{ .Chart.Name }}
+{{- end }}
+Used in a deployment:
+
+
+metadata:
+  name: {{ include "mychart.fullname" . }}
+
+----------------------------------------------------------
+
+🔹 4. required
+Purpose: Forces the user to set a value; otherwise, rendering fails with an error.
+
+Syntax:
+
+
+{{ required "Error message" .Values.mandatoryValue }}
+Example:
+
+
+name: {{ required "You must set .Values.appName!" .Values.appName }}
+If appName is not provided, Helm will throw an error and stop.
+
+----------------------------------------------------------
+
+🔹 5. tpl
+Purpose: Evaluates a string as a template — useful for rendering values that themselves contain templates.
+
+Syntax:
+
+
+{{ tpl .Values.dynamicTemplate . }}
+Example:
+Values file:
+
+
+customMessage: "Hello, {{ .Values.name }}!"
+name: "World"
+Template:
+
+
+message: {{ tpl .Values.customMessage . }}
+Output:
+
+
+message: Hello, World!
+
+----------------------------------------------------------
+
+🔹 6. get
+Purpose: Accesses a value from a dictionary (map) by key.
+
+Syntax:
+
+
+{{ get .Values "keyName" }}
+Example:
+Values file:
+
+
+config:
+  key1: value1
+Template:
+
+
+key1: {{ get .Values.config "key1" }}
+Output:
+
+
+key1: value1
+
+
+
+
+===============================================
+--------------------------------------------
+
+1. Go Template / Sprig Functions
+These provide general-purpose utilities:
+
+String functions
+
+quote, upper, lower, trim, contains, repeat, etc.
+
+Example:
+
+
+{{ .Values.name | upper }}
+List and Dictionary functions
+
+list, dict, hasKey, pluck, get, etc.
+
+Example:
+
+
+{{ get .Values "myKey" }}
+Flow control
+
+if, else, range, with
+
+Example:
+
+
+{{- if .Values.enabled }}
+Math
+
+add, sub, mul, div, mod
+
+Date and time
+
+now, date, dateInZone
+
+--------------------------------------------
+
+2. Helm-Specific Functions
+These are functions built into Helm for chart rendering.
+
+include – Includes the output of another template.
+
+
+{{ include "mychart.fullname" . }}
+required – Fails template rendering if a value is missing.
+
+
+{{ required "A valid name is required" .Values.name }}
+tpl – Evaluates a string as a template.
+
+
+{{ tpl .Values.templateString . }}
+toYaml / toJson – Converts values to YAML or JSON.
+
+
+{{ .Values.config | toYaml | indent 4 }}
+default – Sets a default value if none is provided.
+
+
+{{ .Values.image.tag | default "latest" }}
+printf / print / println – Formatting text
+
+Example in a deployment.yaml Template:
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mychart.fullname" . }}
+spec:
+  replicas: {{ .Values.replicaCount | default 1 }}
+  template:
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default "latest" }}"
+
+--------------------------------------------
