@@ -1,0 +1,67 @@
+Customizing a Helm chart parameter is a common task when deploying applications using Helm
+ in Kubernetes. 
+Helm charts have default configuration values that you can override to customize the deployment.
+
+Here’s how you can do it:
+
+🔧 1. Identify the Parameter to Customize
+Check the chart’s default values.yaml to see which parameters are available. 
+You can usually find it in the chart directory or inspect it using:
+
+helm show values <chart-name> > my-values.yaml
+
+
+Example
+
+helm show values bitnami/nginx > my-values.yaml
+
+
+------------------------------------------------------------
+
+✏️ 2. Modify the Parameter
+Edit my-values.yaml and change the parameter values as needed. For example:
+
+replicaCount: 3
+
+service:
+  type: LoadBalancer
+  port: 8080
+
+-------------------------------------------------------------
+
+🚀 3. Install or Upgrade the Helm Release Using the Custom Values
+
+    helm install my-release <chart-name> -f my-values.yaml
+
+    helm install my-release <chart-name> --values my-values.yaml
+
+Or, if it's already installed:
+
+    helm upgrade my-release <chart-name> -f my-values.yaml
+
+-------------------------------------------------------------
+🚀 4. Install or Upgrade the Helm Release Using the existing Values
+
+helm pull bitnami/wordpress
+
+helm pull --untar bitnami/wordpress
+
+so it will pull/download the wordpress chart folder structure
+
+-----------------------------------------------------------------------
+
+🧪 Alternative: Set Parameters via CLI
+For simple changes, you can set parameters directly in the CLI using --set:
+
+helm install my-release <chart-name> --set replicaCount=3,service.type=LoadBalancer
+
+
+---------------------------------------------------------------------------------
+
+🛠️ Pro Tips:
+Use --dry-run --debug to preview the rendered output before deploying.
+
+Use helm get values my-release to inspect current values.
+
+-------------------------------------------------------------
+
