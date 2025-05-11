@@ -1,0 +1,84 @@
+In a Helm chart, if conditions are used in the templates to conditionally 
+render Kubernetes resources or parts of them, based on values from the values.yaml 
+file or other variables.
+
+Helm uses the Go template language, and the if condition syntax looks like this:
+
+
+{{- if CONDITION }}
+  ... content to render if condition is true ...
+{{- end }}
+
+------------------------------------------------------------------
+
+✅ Example 1: Conditionally create a ConfigMap
+Suppose you only want to create a ConfigMap if a value enableConfigMap is true.
+
+values.yaml
+
+
+enableConfigMap: true
+templates/configmap.yaml
+
+
+{{- if .Values.enableConfigMap }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+data:
+  config.json: |
+    {
+      "key": "value"
+    }
+{{- end }}
+If enableConfigMap is false, this file renders nothing.
+
+------------------------------------------------------------------
+
+✅ Example 2: Optional sidecar container
+You can include a sidecar container only if a value is set.
+
+values.yaml
+
+
+sidecar:
+  enabled: true
+templates/deployment.yaml
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+        - name: main-container
+          image: nginx
+        {{- if .Values.sidecar.enabled }}
+        - name: sidecar
+          image: busybox
+          command: ["sleep", "3600"]
+        {{- end }}
+Notes
+Use {{- and -}} to strip whitespace.
+
+You can also use else:
+
+
+{{- if .Values.enabled }}
+enabled: true
+{{- else }}
+enabled: false
+{{- end }}
+
+------------------------------------------------------------------
