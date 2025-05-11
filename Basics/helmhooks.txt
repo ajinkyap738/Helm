@@ -1,0 +1,71 @@
+In Helm, hooks are a powerful feature that allows you to intervene in the lifecycle of a Helm release. Hooks provide a way to run arbitrary resources (like Jobs or Pods) at specific points during the release process (install, upgrade, delete, etc.).
+
+🔍 What are Hooks in Helm?
+Hooks in Helm are Kubernetes manifest files (like Jobs, Pods, etc.) that are annotated with helm.sh/hook annotations. These annotations tell Helm when to execute those resources during the release lifecycle.
+
+📌 Common Hook Events
+Hook Name	        Trigger Point
+pre-install	        Before resources are installed
+post-install	    After resources are installed
+pre-delete	        Before resources are deleted
+post-delete	        After resources are deleted
+pre-upgrade	        Before an upgrade is performed
+post-upgrade	    After an upgrade is performed
+pre-rollback	    Before a rollback is performed
+post-rollback	    After a rollback is performed
+test	            Used for helm tests (helm test)
+
+✅ Use Cases
+Run database migrations before deploying an app (pre-install)
+
+Backup a database before upgrade (pre-upgrade)
+
+Notify external systems after installation (post-install)
+
+Cleanup resources or perform rollback-specific actions (post-rollback)
+
+🧪 Example: A Pre-install Hook Job
+This Helm template defines a Job that will run before the main application resources are installed.
+
+
+# templates/db-migrate-job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-migrate
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  template:
+    spec:
+      containers:
+        - name: migrate
+          image: my-database-image:latest
+          command: ["sh", "-c", "python migrate.py"]
+      restartPolicy: Never
+🛠️ Hook Delete Policies
+Controls when Helm deletes the hook resource:
+
+before-hook-creation: Delete the hook before a new one is created
+
+hook-succeeded: Delete the hook only if it succeeds
+
+hook-failed: Delete if it fails
+
+before-hook-creation,hook-succeeded: Most common combo
+
+⏱️ Runtime Behavior
+When you run:
+
+
+helm install my-release ./my-chart
+Helm will:
+
+Identify resources with pre-install hooks
+
+Apply them before installing other chart resources
+
+Wait for hook completion (if it's a Job and --wait is used)
+
+Continue with the main chart install
