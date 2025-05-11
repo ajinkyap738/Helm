@@ -1,0 +1,48 @@
+In a Helm chart, the {{ with ... }} block and the $ symbol are commonly used in 
+Helm templates (which use Go's text/template language) to control scope and variable access.
+
+🔹 with Block in Helm
+The with block is used to simplify access to nested objects by changing the
+ scope of . (dot). Inside a with, . refers to the object passed to with.
+
+Syntax:
+
+{{ with .Values.someNestedValue }}
+  key: {{ .someKey }}
+{{ end }}
+🔹 $ in Helm
+$ refers to the root context (global scope), even when you're inside a with or range block where .
+ changes.
+
+✅ Example: Using with and $ Together in Helm
+Values.yaml
+
+app:
+  name: myapp
+  image:
+    repository: nginx
+    tag: "1.19"
+Deployment Template (deployment.yaml)
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.name }}
+spec:
+  template:
+    spec:
+      containers:
+        {{- with .Values.app.image }}
+        - name: {{ $.Values.app.name }}-container
+          image: {{ .repository }}:{{ .tag }}
+        {{- end }}
+🔍 Explanation:
+with .Values.app.image → focuses . on the image map (repository and tag).
+
+{{ .repository }} and {{ .tag }} → accessed relative to image.
+
+{{ $.Values.app.name }} → uses $ to access the root .Values since . is now 
+pointing to .Values.app.image.
+
+This is a common pattern to keep templates readable while still accessing root-level values
+ when needed
