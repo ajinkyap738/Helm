@@ -1,0 +1,76 @@
+A Helm repository is a place where Helm charts (which are packages of pre-configured Kubernetes resources) are stored and shared. Helm uses these repositories to install applications and manage deployments on Kubernetes clusters.
+
+Key Concepts:
+Helm Chart: A bundle of YAML files that describe a related set of Kubernetes resources.
+
+Repository: A collection of Helm charts, typically stored on a web server and accessible via a URL.
+
+Common Helm Repository Commands
+Here are some commonly used commands related to Helm repositories:
+
+1. Add a Helm repository
+
+helm repo add <repo-name> <repo-url>
+
+Example:
+
+helm repo add bitnami https://charts.bitnami.com/bitnami
+
+-------------------------------------------
+2. List repositories
+
+helm repo list
+
+----------------------------------
+
+3. Update repositories
+
+helm repo update
+----------------------------------
+4. Search charts in a repository
+
+helm search repo <chart-name>
+----------------------------------
+5. Install a chart from a repo
+
+helm install <release-name> <repo-name>/<chart-name>
+
+Popular Public Helm Repositories
+Bitnami: https://charts.bitnami.com/bitnami
+
+Prometheus Community: https://prometheus-community.github.io/helm-charts
+
+Grafana: https://grafana.github.io/helm-charts
+
+============================================================
+
+1. Bitnami
+Bitnami provides a vast collection of Helm charts for deploying popular applications on Kubernetes. As of November 18, 2024, Bitnami has transitioned its Helm charts to the OCI (Open Container Initiative) format, hosted on Docker Hub. This change enhances standardization, security, and distribution efficiency. 
+
+
+Installation Command:
+
+
+helm install my-release oci://registry-1.docker.io/bitnamicharts/<chart-name>
+For more details, visit their GitHub repository https://github.com/bitnami/charts .
+
+
+2. TrueCharts
+TrueCharts offers a curated collection of Helm charts, primarily targeting TrueNAS SCALE but also compatible with other Kubernetes environments. They emphasize stability, community-driven development, and a consistent user experience. 
+TrueCharts Charts
+
+Installation Command:
+
+
+helm install my-release oci://tccr.io/truecharts/<chart-name>
+Explore their charts at https://truecharts.org/ .
+
+
+3. Community Operator
+The Community Operator Helm repository is a collection of Helm charts maintained by the Kubernetes community. These charts are designed to deploy Kubernetes Operators, which manage complex applications and services on behalf of users.
+
+Installation Command:
+
+helm repo add community-operators https://operatorhub.io/operatorhubio/community-operators
+helm install my-release community-operators/<operator-name>
+For more information, visit OperatorHub.io.
