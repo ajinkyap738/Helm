@@ -1,0 +1,75 @@
+helm templete directive 
+
+In Helm, a template directive refers to special functions and syntax used within templates to generate Kubernetes manifests dynamically. These directives are based on the Go template language, enhanced with Helm-specific functions.
+
+Here's a breakdown of key Helm template directives and how they are typically used:
+
+🧩 Common Helm Template Directives
+1. {{ .Values }}
+Access values passed into the chart (from values.yaml, CLI, or parent charts).
+
+replicas: {{ .Values.replicaCount }}
+
+
+------------------------------------------------------
+
+2. {{ .Release }}
+Information about the current release (name, namespace, etc.).
+
+metadata:
+  name: {{ .Release.Name }}-app
+
+--------------------------------------------------
+3. {{ .Chart }}
+Access chart metadata (Chart.yaml).
+
+labels:
+  chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+
+--------------------------------------------------
+
+4. {{ include "template.name" . }}
+Includes another named template.
+
+
+{{ include "mychart.labels" . }}
+
+--------------------------------------------------
+
+5. {{ template "name" . }}
+Same as include, but doesn't return a value (deprecated in favor of include).
+--------------------------------------------------
+6. {{ define "template.name" }}
+Defines a reusable named template.
+
+{{- define "mychart.labels" -}}
+app: {{ .Chart.Name }}
+version: {{ .Chart.Version }}
+{{- end -}}
+
+--------------------------------------------------
+7. {{ required "msg" .Values.something }}
+Fails rendering with a message if the value is not set.
+
+name: {{ required "You must set .Values.name" .Values.name }}
+
+
+--------------------------------------------------
+8. Flow control: if, range, with
+
+{{- if .Values.enabled }}
+# This block renders only if 'enabled' is true
+{{- end }}
+
+{{- range .Values.items }}
+- name: {{ .name }}
+{{- end }}
+
+{{- with .Values.nested }}
+key: {{ .key }}
+{{- end }}
+
+--------------------------------------------------
+9. {{ printf }}, {{ toYaml }}, {{ indent }} (Formatting tools)
+
+{{ toYaml .Values.resources | indent 2 }}
